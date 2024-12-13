@@ -1,12 +1,12 @@
 import Foundation
 import Dispatch
 
-func shuffleAnswers(correct: String, incorrect: [String]) -> [String] {
+func mixAnswers(correct: String, incorrect: [String]) -> [String] {
     let allAnswers = incorrect + [correct]
     return allAnswers.shuffled()
 }
 
-func fetchAndPlayTrivia() {
+func fetchAndPlay() {
     let urlString = "https://opentdb.com/api.php?amount=10"
     guard let url = URL(string: urlString) else {
         print("URL invalide.")
@@ -19,7 +19,7 @@ func fetchAndPlayTrivia() {
             exit(EXIT_FAILURE)
         }
         
-        struct TriviaResponse: Codable {
+        struct Response: Codable {
             let results: [Question]
         }
         struct Question: Codable {
@@ -31,7 +31,7 @@ func fetchAndPlayTrivia() {
         }
         
         do {
-            let decoded = try JSONDecoder().decode(TriviaResponse.self, from: data)
+            let decoded = try JSONDecoder().decode(Response.self, from: data)
             
             for (index, question) in decoded.results.enumerated() {
                 print("\nQuestion \(index + 1):")
@@ -39,7 +39,7 @@ func fetchAndPlayTrivia() {
                 print("Difficulté: \(question.difficulty)")
                 print(question.question)
                 
-                let answers = shuffleAnswers(correct: question.correct_answer, incorrect: question.incorrect_answers)
+                let answers = mixAnswers(correct: question.correct_answer, incorrect: question.incorrect_answers)
                 for (i, answer) in answers.enumerated() {
                     print("\(i + 1). \(answer)")
                 }
@@ -55,9 +55,9 @@ func fetchAndPlayTrivia() {
                 } while userAnswer == nil
                 
                 if answers[userAnswer! - 1] == question.correct_answer {
-                    print("✅ Bonne réponse !")
+                    print("Bonne réponse !")
                 } else {
-                    print("❌ Mauvaise réponse. La bonne réponse était : \(question.correct_answer)")
+                    print("Mauvaise réponse. La bonne réponse était : \(question.correct_answer)")
                 }
             }
             
@@ -72,7 +72,7 @@ func fetchAndPlayTrivia() {
 }
 
 DispatchQueue.main.async {
-    fetchAndPlayTrivia()
+    fetchAndPlay()
 }
 
 dispatchMain()
